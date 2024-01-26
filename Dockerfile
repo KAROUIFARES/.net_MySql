@@ -1,15 +1,11 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
-WORKDIR /App
-
-# Copy everything
-COPY . ./
-# Restore as distinct layers
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /app
+COPY *.csproj ./
 RUN dotnet restore
-# Build and publish a release
+COPY . .
 RUN dotnet publish -c Release -o out
 
-# Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /App
-COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "DotNet.Docker.dll"]
+WORKDIR /app
+COPY --from=build /app/out .
+ENTRYPOINT ["dotnet", ".net_MySql.dll"]
